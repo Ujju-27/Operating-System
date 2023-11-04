@@ -5,8 +5,7 @@
 #include <sys/wait.h>
 
 int main() {
-	
-	printf("Name - Ujjawal Singh Tolia Section - J Class Rollno - 69\n\n");
+
     pid_t child_pid;
 
     child_pid = fork(); // Create a child process
@@ -39,4 +38,3 @@ int main() {
 
     return 0;
 }
-
