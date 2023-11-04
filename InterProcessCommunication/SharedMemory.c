@@ -7,8 +7,7 @@
 #include <unistd.h>
 
 int main() {
-
-	printf("Name - Ujjawal Singh Tolia Section - J Class Rollno - 69\n\n");
+	
     key_t key;
     int shmid;
     char *shmaddr;
