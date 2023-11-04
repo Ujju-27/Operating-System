@@ -1,66 +1,38 @@
+//for Sending Process
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include<sys/wait.h>
 #include <unistd.h>
-
-int main() {
-	
-    key_t key;
+#include <sys/shm.h>
+#include <string.h>
+int main()
+{
+    void *shared_memory;
+    char buff[100];
     int shmid;
-    char *shmaddr;
-
-    // Generate a unique key for the shared memory segment
-    key = ftok("/tmp", 'A');
-
-    // Create a shared memory segment with the given key
-    shmid = shmget(key, 1024, 0666 | IPC_CREAT);
-
-    if (shmid == -1) {
-        perror("shmget");
-        exit(1);
-    }
-
-    // Attach the shared memory segment to this process
-    shmaddr = (char *)shmat(shmid, (void *)0, 0);
-
-    if (shmaddr == (char *)(-1)) {
-        perror("shmat");
-        exit(1);
-    }
-
-    // Parent process writes to shared memory
-    strcpy(shmaddr, "Hello from the parent process!");
-
-    // Fork a child process
-    pid_t pid = fork();
-
-    if (pid < 0) {
-        perror("fork");
-        exit(1);
-    }
-
-    if (pid == 0) {
-        // Child process reads from shared memory
-        printf("Child process read: %s\n", shmaddr);
-
-        // Detach from the shared memory segment
-        shmdt(shmaddr);
-    } else {
-        // Parent process waits for the child to finish
-        wait(NULL);
-
-        // Detach from the shared memory segment
-        shmdt(shmaddr);
-
-        // Remove the shared memory segment
-        shmctl(shmid, IPC_RMID, NULL);
-    }
-
-    return 0;
+    shmid = shmget((key_t)1122, 1024, 0666 | IPC_CREAT);
+    printf("key of shared memory is :: %d\n", shmid);
+    shared_memory = shmat(shmid, NULL, 0);
+    printf("process attached at :: %p\n", shared_memory);
+    printf("enter some data to write to the shared memory\n");
+    read(0, buff, 100);
+    strcpy(shared_memory, buff);
+    printf("you wrote :: %s\n", (char *)shared_memory);
 }
 
-
-//hello
+// code for the reciever process
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/shm.h>
+#include <string.h>
+int main()
+{
+    void *shared_memory;
+    char buff[100];
+    int shmid;
+    shmid = shmget((key_t)1122, 1024, 0666);
+    printf("key of shared memory is :: %d\n", shmid);
+    shared_memory = shmat(shmid, NULL, 0);
+    printf("process attached at:: %p\n", shared_memory);
+    printf("data read from the memory is :: %s\n", (char *)shared_memory);
+}
